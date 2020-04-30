@@ -3,6 +3,7 @@ package io.github.cottonmc.cotton.gui.client;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
 
 import io.github.cottonmc.cotton.gui.CottonCraftingController;
@@ -12,6 +13,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
+
+import java.util.Objects;
 
 public class CottonInventoryScreen<T extends CottonCraftingController> extends HandledScreen<T> implements TextHoverRendererScreen {
 	protected CottonCraftingController description;
@@ -88,11 +91,20 @@ public class CottonInventoryScreen<T extends CottonCraftingController> extends H
 			this.client.player.closeHandledScreen();
 			return true;
 		} else {
-			//if (super.keyPressed(ch, keyCode, modifiers)) return true;
 			if (description.getFocus()==null) {
 				if (MinecraftClient.getInstance().options.keyInventory.matchesKey(ch, keyCode)) {
 					this.client.player.closeHandledScreen();
 					return true;
+				}
+				this.handleHotbarKeyPressed(ch, keyCode);
+				if (this.focusedSlot != null && this.focusedSlot.hasStack()) {
+					if (Objects.requireNonNull(this.client).options.keyPickItem.matchesKey(ch, keyCode)) {
+						this.onMouseClick(this.focusedSlot, this.focusedSlot.id, 0, SlotActionType.CLONE);
+						return true;
+					} else if (this.client.options.keyDrop.matchesKey(ch, keyCode)) {
+						this.onMouseClick(this.focusedSlot, this.focusedSlot.id, hasControlDown() ? 1 : 0, SlotActionType.THROW);
+						return true;
+					}
 				}
 				return false;
 			} else {
