@@ -21,6 +21,7 @@ public class WItemSlot extends WWidget {
 	private int slotsHigh = 1;
 	private boolean big = false;
 	private boolean modifiable = true;
+	private boolean validated;
 	
 	public WItemSlot(Inventory inventory, int startIndex, int slotsWide, int slotsHigh, boolean big, boolean ltr) {
 		this.inventory = inventory;
@@ -105,6 +106,7 @@ public class WItemSlot extends WWidget {
 
 	@Override
 	public void createPeers(GuiDescription c) {
+		if (isValidated()) return;
 		super.createPeers(c);
 		peers.clear();
 		int index = startIndex;
@@ -118,6 +120,7 @@ public class WItemSlot extends WWidget {
 				index++;
 			}
 		}
+		setValidated(true);
 	}
 	
 	@Environment(EnvType.CLIENT)
@@ -146,5 +149,14 @@ public class WItemSlot extends WWidget {
 				}
 			}
 		}
+	}
+	
+	public boolean isValidated() {
+		return validated;
+	}
+	
+	public WItemSlot setValidated(boolean validated) {
+		this.validated = validated;
+		return this;
 	}
 }
